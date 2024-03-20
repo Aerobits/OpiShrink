@@ -1,5 +1,5 @@
 
-# PiShrink #
+# Orange PiShrink #
 
 PiShrink is a bash script that automatically shrink a pi image that will then resize to the max size of the SD card on boot. This will make putting the image back onto the SD card faster and the shrunk images will compress better.
 In addition the shrunk image can be compressed with gzip and xz to create an even smaller image. Parallel compression of the image
@@ -43,9 +43,9 @@ If using Ubuntu, you will likely see an error about `e2fsck` being out of date a
 ## Installation ##
 
 ```bash
-wget https://raw.githubusercontent.com/Drewsif/PiShrink/master/pishrink.sh
-chmod +x pishrink.sh
-sudo mv pishrink.sh /usr/local/bin
+wget https://raw.githubusercontent.com/Aerobits/OpiShrink/master/opishrink.sh
+chmod +x opishrink.sh
+sudo mv opishrink.sh /usr/local/bin
 ```
 
 ## Example ##
