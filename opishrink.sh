@@ -100,18 +100,18 @@ cat <<\EOF1 > "$mountdir/etc/rc.local"
 do_expand_rootfs() {
   ROOT_PART=$(mount | sed -n 's|^/dev/\(.*\) on / .*|\1|p')
 
-  PART_NUM=${ROOT_PART#mmcblk0p}
+  PART_NUM=${ROOT_PART#mmcblk${1}p}
   if [ "$PART_NUM" = "$ROOT_PART" ]; then
     echo "$ROOT_PART is not an SD card. Don't know how to expand"
     return 0
   fi
 
   # Get the starting offset of the root partition
-  PART_START=$(parted /dev/mmcblk0 -ms unit s p | grep "^${PART_NUM}" | cut -f 2 -d: | sed 's/[^0-9]//g')
+  PART_START=$(parted /dev/mmcblk${1} -ms unit s p | grep "^${PART_NUM}" | cut -f 2 -d: | sed 's/[^0-9]//g')
   [ "$PART_START" ] || return 1
   # Return value will likely be error for fdisk as it fails to reload the
   # partition table because the root fs is mounted
-  fdisk /dev/mmcblk0 <<EOF
+  fdisk /dev/mmcblk${1} <<EOF
 p
 d
 $PART_NUM
@@ -126,8 +126,10 @@ EOF
 
 cat <<EOF > /etc/rc.local &&
 #!/bin/sh
-echo "Expanding /dev/$ROOT_PART"
-resize2fs /dev/$ROOT_PART
+echo "Expanding /dev/mmcblk0p1"
+resize2fs /dev/mmcblk0p1
+echo "Expanding /dev/mmcblk1p1"
+resize2fs /dev/mmcblk1p1
 rm -f /etc/rc.local; cp -fp /etc/rc.local.bak /etc/rc.local && /etc/rc.local
 
 EOF
@@ -147,7 +149,8 @@ fi
 raspi_config_expand
 echo "WARNING: Using backup expand..."
 sleep 5
-do_expand_rootfs
+do_expand_rootfs 0
+do_expand_rootfs 1
 echo "ERROR: Expanding failed..."
 sleep 5
 if [[ -f /etc/rc.local.bak ]]; then
